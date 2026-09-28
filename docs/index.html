@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Export Remote Job Data to CSV / JSON / SQLite (2026)</title>
+  <meta name="description" content="Pull normalized remote-job data from 5 job boards (Remotive, RemoteOK, Jobicy, WWR, Hacker News) into CSV, JSON or SQLite in one command - no scraping, no API key. Free tool + code examples.">
+  <meta name="keywords" content="export remote jobs to csv, remote job data sqlite, remote job api, scrape remote jobs, remote jobs csv export, remote job dataset, job board api no auth">
+  <link rel="canonical" href="https://earnnova-dev.github.io/remote-jobs-export/">
+  <meta property="og:title" content="Export Remote Job Data to CSV / JSON / SQLite (2026)">
+  <meta property="og:description" content="One command pulls normalized remote-job data from 5 boards into CSV, JSON or SQLite. Free, stdlib-only, no API key.">
+  <meta property="og:type" content="website">
+  <style>
+    :root{--bg:#0b1020;--card:#121a30;--ink:#e8ecf5;--mut:#9aa6c4;--acc:#5b8cff;--ok:#37d39b;--code:#0e1526}
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+    header{padding:48px 0 24px}
+    h1{font-size:34px;line-height:1.2;margin:0 0 12px}
+    .sub{color:var(--mut);font-size:18px;margin:0 0 20px}
+    .cta{display:inline-block;background:var(--acc);color:#fff;padding:12px 22px;border-radius:10px;font-weight:600}
+    .cta:hover{filter:brightness(1.08);text-decoration:none}
+    section{background:var(--card);border:1px solid #1c2743;border-radius:14px;padding:24px;margin:22px 0}
+    h2{font-size:23px;margin:0 0 12px}
+    pre{background:var(--code);border:1px solid #1c2743;border-radius:10px;padding:16px;overflow:auto;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    p code{background:#0e1526;padding:2px 6px;border-radius:5px}
+    ul{margin:8px 0 8px 20px} li{margin:6px 0}
+    table{width:100%;border-collapse:collapse;font-size:15px}
+    th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #1c2743}
+    th{color:var(--mut);font-weight:600}
+    .badge{display:inline-block;background:#0e1526;border:1px solid #1c2743;border-radius:999px;padding:3px 12px;font-size:13px;color:var(--mut);margin:0 6px 6px 0}
+    footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <h1>Export remote job data to CSV, JSON or SQLite &mdash; in one command</h1>
+    <p class="sub">Pull a normalized dataset of remote jobs from 5 boards (Remotive, RemoteOK, Jobicy, We Work Remotely, Hacker News) into a spreadsheet, a database, or your own pipeline. No scraping, no API key, no dependencies.</p>
+    <a class="cta" href="#install">pip install remote-jobs-export</a>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>What you get</h2>
+      <p>One API normalizes 5 remote-job boards into a single clean schema. The <a href="https://github.com/earnnova-dev/remote-jobs-export">remote-jobs-export</a> tool pulls that data locally so you can work with it offline &mdash; a CSV to open in Excel/Google Sheets, a SQLite file for SQL, or a JSON feed for your own code.</p>
+      <span class="badge">Stdlib-only (no deps)</span>
+      <span class="badge">No API key (free tier)</span>
+      <span class="badge">5 boards, one schema</span>
+      <span class="badge">CSV &middot; JSON &middot; SQLite</span>
+    </section>
+
+    <section id="install">
+      <h2>Install &amp; run</h2>
+      <pre>pip install remote-jobs-export
+
+# Snapshot 100 jobs to a CSV (no key needed)
+remote-jobs-export --limit 100 -o jobs.csv
+
+# To SQLite for SQL analysis
+remote-jobs-export --limit 200 -o jobs.db
+
+# To JSON for your own pipeline
+remote-jobs-export --limit 200 -o jobs.json
+
+# One-line summary (counts by source / category / location)
+remote-jobs-export --limit 300 --summary</pre>
+      <p>Or run it straight from the repo without installing:</p>
+      <pre>python -m remote_jobs_export.cli --help</pre>
+    </section>
+
+    <section>
+      <h2>Filter your export</h2>
+      <pre># Only Remotive
+remote-jobs-export --source remotive -o remotive.csv
+
+# Filter by skills
+remote-jobs-export --skills python,devops -o python_devops.csv
+
+# Only high-score (quality) listings
+remote-jobs-export --min-score 70 -o top.csv</pre>
+    </section>
+
+    <section>
+      <h2>The normalized schema</h2>
+      <p>Every record is the same shape regardless of source board, which is what makes cross-board analysis practical:</p>
+      <table>
+        <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>title</code></td><td>Job title</td></tr>
+          <tr><td><code>company</code></td><td>Company name</td></tr>
+          <tr><td><code>location</code></td><td>Remote / location label</td></tr>
+          <tr><td><code>category</code></td><td>Job category</td></tr>
+          <tr><td><code>skills</code></td><td>Required skills</td></tr>
+          <tr><td><code>salary</code></td><td>Salary range (when listed)</td></tr>
+          <tr><td><code>source</code></td><td>Origin board (remotive / remoteok / jobicy / wwr / hn)</td></tr>
+          <tr><td><code>published</code></td><td>Canonical ISO-8601 UTC date (or blank)</td></tr>
+          <tr><td><code>url</code></td><td>Link to the original listing</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Where the data comes from</h2>
+      <p>The tool reads the <a href="https://remote-jobs-api.tten.no/">Remote Jobs API</a>, which aggregates 5 boards into one endpoint. The free tier is keyless, so a first export works with no setup at all. If you want the raw API (JSON, no local export step), see <a href="https://remote-jobs-api.tten.no/">remote-jobs-api.tten.no</a>.</p>
+      <p>Related tools in the same product line:</p>
+      <ul>
+        <li><a href="https://remote-jobs-api.tten.no/">Remote Jobs API</a> &mdash; the live normalized feed (JSON) behind this exporter.</li>
+        <li><a href="https://github.com/earnnova-dev/jobfeed-watchdog">jobfeed-watchdog</a> &mdash; a GitHub Action that alerts when a job feed silently breaks or its schema changes.</li>
+        <li><a href="https://earnnova-dev.github.io/gigwatch/">GigWatch</a> &mdash; monitoring + digest alerts on top of job feeds.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Use cases</h2>
+      <ul>
+        <li><strong>Recruiters / talent mapping:</strong> build a snapshot of a niche (e.g. "remote Python devops roles") and trend it over time.</li>
+        <li><strong>Data analysts:</strong> load remote-job data into SQLite and run your own <code>GROUP BY source</code> / salary analysis.</li>
+        <li><strong>Researchers:</strong> a reproducible, dated sample of the remote-job market for a specific day.</li>
+        <li><strong>Automation:</strong> feed a JSON export into your own pipeline or dashboard.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Repository</h2>
+      <p>Source, tests and a live E2E example live on GitHub:</p>
+      <pre>https://github.com/earnnova-dev/remote-jobs-export</pre>
+      <p>MIT licensed. Stdlib-only, Python 3.8+, no third-party dependencies.</p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>Export remote job data to CSV / JSON / SQLite &mdash; a free, stdlib-only tool. &copy; 2026 Nova (earnnova-dev).</p>
+  </footer>
+</body>
+</html>

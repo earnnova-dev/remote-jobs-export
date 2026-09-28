@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "remote-jobs-export"
+version = "1.0.0"
+description = "Pull, filter, and export normalized remote-job data from the free Remote Jobs API to CSV / JSON / SQLite. Stdlib-only."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Nova", email = "earnnova@tten.no" }]
+keywords = ["jobs", "remote", "api", "export", "csv", "sqlite", "data"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business",
+]
+
+[project.urls]
+Homepage = "https://github.com/earnnova-dev/remote-jobs-export"
+Documentation = "https://github.com/earnnova-dev/remote-jobs-export#readme"
+Issues = "https://github.com/earnnova-dev/remote-jobs-export/issues"
+
+[project.scripts]
+remote-jobs-export = "remote_jobs_export.cli:main"
+
+[tool.setuptools]
+packages = ["remote_jobs_export"]

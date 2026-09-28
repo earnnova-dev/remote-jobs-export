@@ -1,0 +1,103 @@
+# remote-jobs-export
+
+Pull, filter, and export normalized remote-job data from the **free [Remote Jobs API](https://remote-jobs-api.tten.no/)** to **CSV / JSON / SQLite** — or print a quick summary. **Stdlib-only** (no third-party dependencies), no API key required for the free tier.
+
+The API aggregates 5 boards (Remotive, RemoteOK, Jobicy, We Work Remotely, Hacker News) into one clean schema. This tool pulls that data locally so you can analyze it in a spreadsheet, a database, or a script — no scraping, no key juggling.
+
+## Why
+
+- You want a snapshot of remote jobs as a **CSV** to open in Excel/Google Sheets.
+- You want the data in **SQLite** for quick SQL analysis (`SELECT ... GROUP BY source`).
+- You want a **JSON** file to feed into your own pipeline.
+- You want a one-line **summary** (counts by source / category / location).
+
+It's the offline, export-focused companion to the API itself.
+
+## Install
+
+```bash
+pip install remote-jobs-export
+```
+
+Or run it directly from this repo without installing:
+
+```bash
+python -m remote_jobs_export.cli --help
+```
+
+## Quick start
+
+```bash
+# Export 100 jobs to a CSV file (no key needed)
+remote-jobs-export --limit 100 -o jobs.csv
+
+# Export to SQLite for SQL analysis
+remote-jobs-export --limit 200 -o jobs.db
+
+# Export to JSON
+remote-jobs-export --limit 200 -o jobs.json
+
+# Filter by source (remotive / remoteok / jobicy / wwr / hn)
+remote-jobs-export --source remotive -o remotive.csv
+
+# Filter by skills (comma-separated)
+remote-jobs-export --skills python,devops -o python_devops.csv
+
+# Filter by minimum skill fit-score (0-100)
+remote-jobs-export --min-score 70 -o top.csv
+
+# Just print a summary (no file)
+remote-jobs-export --limit 300 --summary
+```
+
+### Example summary output
+
+```json
+{
+  "total": 200,
+  "by_source": [["jobicy", 120], ["wwr", 55], ["remoteok", 19], ["remotive", 6]],
+  "by_category": [["Customer Support", 10], ["DevOps and Sysadmin", 10], ...],
+  "top_locations": [["Anywhere in the World", 54], ["USA / Any", 14], ...],
+  "scored_jobs": 200
+}
+```
+
+## Output schema (12 columns)
+
+| column | type | notes |
+|---|---|---|
+| `id` | text | stable job id |
+| `title` | text | |
+| `company` | text | |
+| `location` | text | may be empty |
+| `category` | text | may be empty |
+| `source` | text | `remotive` / `remoteok` / `jobicy` / `wwr` / `hn` |
+| `salary` | text | may be empty |
+| `tags` | CSV: comma-joined · JSON/SQLite: list | deduped, order-preserving |
+| `fit_score` | int | 0-100, or null |
+| `published` | text | ISO-8601 UTC or empty |
+| `url` | text | original job listing URL |
+| `description` | text | |
+
+## Python API
+
+```python
+from remote_jobs_export import fetch_jobs, export_csv, export_sqlite, summarize
+
+jobs = fetch_jobs(limit=200, skills=["python"])   # keyless free tier
+export_csv(jobs, "jobs.csv")
+export_sqlite(jobs, "jobs.db")
+print(summarize(jobs))
+```
+
+A paid `api_key` can be passed to `fetch_jobs(api_key=...)` (sent as `Authorization: Bearer ...`) for higher limits / extra filters.
+
+## Notes
+
+- **Free tier needs no key.** The default base (`https://remote-jobs-api.tten.no`) serves the free tier keyless.
+- **Stdlib-only.** Python 3.8+. No `requests`, no `pandas`.
+- **Idempotent.** Re-exporting to the same SQLite file replaces the `jobs` table.
+
+## License
+
+MIT

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "remote-jobs-export"
-version = "1.0.0"
+version = "1.1.0"
 description = "Pull, filter, and export normalized remote-job data from the free Remote Jobs API to CSV / JSON / SQLite. Stdlib-only."
 readme = "README.md"
 requires-python = ">=3.8"

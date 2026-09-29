@@ -46,6 +46,9 @@ remote-jobs-export --skills python,devops -o python_devops.csv
 # Filter by minimum skill fit-score (0-100)
 remote-jobs-export --min-score 70 -o top.csv
 
+# Filter by minimum salary (server-side; on the parsed top-of-range salary_max)
+remote-jobs-export --min-salary 90000 -o senior.csv
+
 # Just print a summary (no file)
 remote-jobs-export --limit 300 --summary
 ```
@@ -62,7 +65,7 @@ remote-jobs-export --limit 300 --summary
 }
 ```
 
-## Output schema (12 columns)
+## Output schema (16 columns)
 
 | column | type | notes |
 |---|---|---|
@@ -72,7 +75,11 @@ remote-jobs-export --limit 300 --summary
 | `location` | text | may be empty |
 | `category` | text | may be empty |
 | `source` | text | `remotive` / `remoteok` / `jobicy` / `wwr` / `hn` |
-| `salary` | text | may be empty |
+| `salary` | text | raw string, may be empty |
+| `salary_min` | int | parsed minimum salary, or null |
+| `salary_max` | int | parsed maximum salary, or null |
+| `salary_currency` | text | e.g. `USD`, may be empty |
+| `salary_period` | text | e.g. `year` / `month` / `day`, may be empty |
 | `tags` | CSV: comma-joined · JSON/SQLite: list | deduped, order-preserving |
 | `fit_score` | int | 0-100, or null |
 | `published` | text | ISO-8601 UTC or empty |
@@ -84,7 +91,7 @@ remote-jobs-export --limit 300 --summary
 ```python
 from remote_jobs_export import fetch_jobs, export_csv, export_sqlite, summarize
 
-jobs = fetch_jobs(limit=200, skills=["python"])   # keyless free tier
+jobs = fetch_jobs(limit=200, skills=["python"], min_salary=90000)   # keyless free tier; filter by min salary
 export_csv(jobs, "jobs.csv")
 export_sqlite(jobs, "jobs.db")
 print(summarize(jobs))

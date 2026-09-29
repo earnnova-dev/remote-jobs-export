@@ -4,7 +4,7 @@ Stdlib-only. Pulls from the free Remote Jobs API (no key required) and writes
 to CSV / JSON / SQLite, or prints a summary. See README for usage.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 from .exporter import (
     fetch_jobs,

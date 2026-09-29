@@ -9,6 +9,7 @@ import tempfile
 from remote_jobs_export import exporter
 from remote_jobs_export.exporter import (
     COLUMNS,
+    fetch_jobs,
     export_csv,
     export_json,
     export_sqlite,
@@ -19,7 +20,7 @@ from remote_jobs_export.exporter import (
 
 def _sample_jobs():
     return [
-        {
+        normalize_job({
             "id": "a1",
             "title": "Python Engineer",
             "company": "Acme",
@@ -32,8 +33,12 @@ def _sample_jobs():
             "published": "2026-09-28T07:31:13+00:00",
             "url": "https://example.com/a1",
             "description": "desc a1",
-        },
-        {
+            "salary_min": 100000,
+            "salary_max": 120000,
+            "salary_currency": "USD",
+            "salary_period": "year",
+        }),
+        normalize_job({
             "id": "b2",
             "title": "Frontend Dev",
             "company": "Globex",
@@ -46,7 +51,7 @@ def _sample_jobs():
             "published": "",
             "url": "https://example.com/b2",
             "description": "desc b2",
-        },
+        }),
     ]
 
 
@@ -106,3 +111,50 @@ def test_summarize_counts():
     loc = dict(s["top_locations"])
     assert loc["Anywhere in the World"] == 1
     assert s["scored_jobs"] == 1
+
+
+def test_normalize_carries_structured_salary():
+    row = normalize_job({
+        "id": "s", "title": "T", "company": "C", "source": "wwr",
+        "salary": "$100k-$120k", "salary_min": 100000, "salary_max": 120000,
+        "salary_currency": "USD", "salary_period": "year", "tags": [],
+        "fit_score": None, "published": "", "url": "u", "description": "d",
+    })
+    assert row["salary_min"] == 100000
+    assert row["salary_max"] == 120000
+    assert row["salary_currency"] == "USD"
+    assert row["salary_period"] == "year"
+
+
+def test_normalize_missing_salary_fields_default():
+    row = normalize_job({"id": "x", "title": "T", "company": "C"})
+    assert row["salary_min"] is None
+    assert row["salary_max"] is None
+    assert row["salary_currency"] == ""
+    assert row["salary_period"] == ""
+
+
+def test_export_sqlite_stores_salary(tmp_path):
+    p = str(tmp_path / "out.db")
+    export_sqlite(_sample_jobs(), p)
+    con = sqlite3.connect(p)
+    one = con.execute("SELECT salary_min, salary_max, salary_currency, salary_period FROM jobs WHERE id='a1'").fetchone()
+    assert one == (100000, 120000, "USD", "year")
+    con.close()
+
+
+def test_fetch_passes_min_salary(tmp_path):
+    captured = {}
+
+    def fake_get(url, timeout=30.0, api_key=None):
+        captured["url"] = url
+        return b'{"jobs": []}'
+
+    exporter._http_get = fake_get
+    try:
+        fetch_jobs(base="http://localhost", min_salary=90000, limit=10)
+    finally:
+        # restore
+        import importlib
+        importlib.reload(exporter)
+    assert "min_salary=90000" in captured["url"]

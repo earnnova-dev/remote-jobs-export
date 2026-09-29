@@ -26,6 +26,10 @@ COLUMNS = [
     "category",
     "source",
     "salary",
+    "salary_min",
+    "salary_max",
+    "salary_currency",
+    "salary_period",
     "tags",
     "fit_score",
     "published",
@@ -59,6 +63,7 @@ def fetch_jobs(
     skills: Optional[List[str]] = None,
     source: Optional[str] = None,
     min_score: Optional[int] = None,
+    min_salary: Optional[int] = None,
     limit: int = DEFAULT_LIMIT,
     timeout: float = 30.0,
 ) -> List[Dict[str, Any]]:
@@ -74,6 +79,8 @@ def fetch_jobs(
         params["source"] = source
     if min_score is not None:
         params["min_score"] = int(min_score)
+    if min_salary is not None:
+        params["min_salary"] = int(min_salary)
     qs = urllib.parse.urlencode(params)
     url = f"{base.rstrip('/')}/v1/jobs?{qs}"
     raw = _http_get(url, timeout=timeout, api_key=api_key)
@@ -101,6 +108,10 @@ def normalize_job(j: Dict[str, Any]) -> Dict[str, Any]:
         "category": (j.get("category") or "").strip(),
         "source": (j.get("source") or "").strip(),
         "salary": (j.get("salary") or "").strip(),
+        "salary_min": j.get("salary_min"),
+        "salary_max": j.get("salary_max"),
+        "salary_currency": (j.get("salary_currency") or "").strip(),
+        "salary_period": (j.get("salary_period") or "").strip(),
         "tags": tags,
         "fit_score": j.get("fit_score"),
         "published": (j.get("published") or "").strip(),
@@ -118,6 +129,10 @@ def _row_for_csv(job: Dict[str, Any]) -> Dict[str, Any]:
         "category": job["category"],
         "source": job["source"],
         "salary": job["salary"],
+        "salary_min": job["salary_min"],
+        "salary_max": job["salary_max"],
+        "salary_currency": job["salary_currency"],
+        "salary_period": job["salary_period"],
         "tags": ",".join(job["tags"]),
         "fit_score": job["fit_score"],
         "published": job["published"],
@@ -162,6 +177,10 @@ def export_sqlite(jobs: List[Dict[str, Any]], path: str, table: str = "jobs") ->
         "category": "TEXT",
         "source": "TEXT",
         "salary": "TEXT",
+        "salary_min": "INTEGER",
+        "salary_max": "INTEGER",
+        "salary_currency": "TEXT",
+        "salary_period": "TEXT",
         "tags": "TEXT",
         "fit_score": "INTEGER",
         "published": "TEXT",
@@ -180,7 +199,9 @@ def export_sqlite(jobs: List[Dict[str, Any]], path: str, table: str = "jobs") ->
         rows = [
             (
                 j["id"], j["title"], j["company"], j["location"], j["category"],
-                j["source"], j["salary"], json.dumps(j["tags"], ensure_ascii=False),
+                j["source"], j["salary"], j["salary_min"], j["salary_max"],
+                j["salary_currency"], j["salary_period"],
+                json.dumps(j["tags"], ensure_ascii=False),
                 j["fit_score"], j["published"], j["url"], j["description"],
             )
             for j in jobs

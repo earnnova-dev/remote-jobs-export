@@ -170,7 +170,10 @@ def export_sqlite(jobs: List[Dict[str, Any]], path: str, table: str = "jobs") ->
     ``tags`` is stored as a JSON array text; ``fit_score`` as INTEGER or NULL.
     """
     cols = {
-        "id": "TEXT PRIMARY KEY",
+        # ``id`` is intentionally NOT a PRIMARY KEY: the feed id is not
+        # guaranteed to be present (normalize_job defaults it to "") or unique,
+        # and a UNIQUE constraint made export crash on a missing/duplicated id.
+        "id": "TEXT",
         "title": "TEXT",
         "company": "TEXT",
         "location": "TEXT",

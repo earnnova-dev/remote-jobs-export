@@ -158,3 +158,39 @@ def test_fetch_passes_min_salary(tmp_path):
         import importlib
         importlib.reload(exporter)
     assert "min_salary=90000" in captured["url"]
+
+
+def test_export_sqlite_empty_id_does_not_crash(tmp_path):
+    # normalize_job defaults a missing id to ""; several such rows must not
+    # violate the (former) UNIQUE id primary key.
+    p = str(tmp_path / "out.db")
+    jobs = [
+        normalize_job({"title": "A", "company": "X"}),
+        normalize_job({"title": "B", "company": "Y"}),
+    ]
+    n = export_sqlite(jobs, p)
+    assert n == 2
+    con = sqlite3.connect(p)
+    cnt = con.execute("SELECT COUNT(*) FROM jobs").fetchone()[0]
+    assert cnt == 2
+    titles = {r[0] for r in con.execute("SELECT title FROM jobs")}
+    assert titles == {"A", "B"}
+    con.close()
+
+
+def test_export_sqlite_duplicate_id_does_not_crash(tmp_path):
+    # A feed may carry two records with the same id; export must not raise.
+    p = str(tmp_path / "out.db")
+    jobs = [
+        normalize_job({"id": "dup", "title": "First", "company": "X"}),
+        normalize_job({"id": "dup", "title": "Second", "company": "Y"}),
+    ]
+    n = export_sqlite(jobs, p)
+    assert n == 2
+    con = sqlite3.connect(p)
+    cnt = con.execute("SELECT COUNT(*) FROM jobs").fetchone()[0]
+    assert cnt == 2
+    # id lookup still works (now non-unique): returns both matching rows.
+    dups = con.execute("SELECT COUNT(*) FROM jobs WHERE id='dup'").fetchone()[0]
+    assert dups == 2
+    con.close()

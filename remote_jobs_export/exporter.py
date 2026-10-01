@@ -72,6 +72,16 @@ def fetch_jobs(
     Returns a list of dicts with the :data:`COLUMNS` keys (missing fields
     coerced to ``""`` / ``[]`` / ``None``).
     """
+    # The API couples min_score to skills: sending min_score without skills
+    # returns HTTP 400 {"error": "min_score requires skills"}. Fail fast with a
+    # clear, actionable message instead of surfacing a raw 400 to the user.
+    if min_score is not None and not skills:
+        raise FetchError(
+            "min_score requires the skills filter: pass --skills (e.g. --skills python) "
+            "alongside --min-score, or drop --min-score. (The Remote Jobs API only "
+            "supports fit-score filtering for skill queries.)"
+        )
+
     params: Dict[str, Any] = {"limit": max(1, int(limit))}
     if skills:
         params["skills"] = ",".join(skills)

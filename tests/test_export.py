@@ -194,3 +194,28 @@ def test_export_sqlite_duplicate_id_does_not_crash(tmp_path):
     dups = con.execute("SELECT COUNT(*) FROM jobs WHERE id='dup'").fetchone()[0]
     assert dups == 2
     con.close()
+
+
+def test_fetch_min_score_without_skills_is_rejected_locally():
+    # The API rejects a min_score filter that is not accompanied by skills
+    # (HTTP 400 {"error": "min_score requires skills"}). The client must fail
+    # fast with a clear, actionable message and NOT make the network call.
+    called = {"n": 0}
+
+    def fake_get(url, timeout=30.0, api_key=None):
+        called["n"] += 1
+        return b'{"jobs": []}'
+
+    exporter._http_get = fake_get
+    try:
+        try:
+            fetch_jobs(base="http://localhost", min_score=70, limit=5)
+            raise AssertionError("expected FetchError for min_score without skills")
+        except exporter.FetchError as e:
+            msg = str(e)
+            assert "skills" in msg.lower(), msg
+            assert "min_score" in msg, msg
+        assert called["n"] == 0, "no network call should be made"
+    finally:
+        import importlib
+        importlib.reload(exporter)

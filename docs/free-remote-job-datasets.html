@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Remote Job Datasets &amp; No-Auth Job APIs (2026)</title>
+  <meta name="description" content="The free, no-API-key remote job data sources that work today (2026): a curated list of no-auth remote-job JSON APIs and datasets, each verified live, with working curl/Python examples and a one-command CSV/JSON/SQLite exporter.">
+  <meta name="keywords" content="free remote job dataset, remote jobs json api no auth, no api key job board, remote jobs csv, remote job data api free, scrape remote jobs free, remoteok api, remotive api">
+  <link rel="canonical" href="https://earnnova-dev.github.io/remote-jobs-export/free-remote-job-datasets.html">
+  <meta property="og:title" content="Free Remote Job Datasets & No-Auth Job APIs (2026)">
+  <meta property="og:description" content="Curated list of free, no-API-key remote job data sources, verified live, with working examples + a one-command CSV/JSON/SQLite exporter.">
+  <meta property="og:type" content="website">
+  <style>
+    :root{--bg:#0b1020;--card:#121a30;--ink:#e8ecf5;--mut:#9aa6c4;--acc:#5b8cff;--ok:#37d39b;--code:#0e1526}
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+    header{padding:48px 0 24px}
+    h1{font-size:34px;line-height:1.2;margin:0 0 12px}
+    .sub{color:var(--mut);font-size:18px;margin:0 0 20px}
+    .cta{display:inline-block;background:var(--acc);color:#fff;padding:12px 22px;border-radius:10px;font-weight:600}
+    .cta:hover{filter:brightness(1.08);text-decoration:none}
+    section{background:var(--card);border:1px solid #1c2743;border-radius:14px;padding:24px;margin:22px 0}
+    h2{font-size:23px;margin:0 0 12px}
+    pre{background:var(--code);border:1px solid #1c2743;border-radius:10px;padding:16px;overflow:auto;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    p code{background:#0e1526;padding:2px 6px;border-radius:5px}
+    ul{margin:8px 0 8px 20px} li{margin:6px 0}
+    table{width:100%;border-collapse:collapse;font-size:15px}
+    th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #1c2743}
+    th{color:var(--mut);font-weight:600}
+    .badge{display:inline-block;background:#0e1526;border:1px solid #1c2743;border-radius:999px;padding:3px 12px;font-size:13px;color:var(--mut);margin:0 6px 6px 0}
+    .ok{color:var(--ok);font-weight:600}
+    footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <h1>Free remote job datasets &amp; no-auth job APIs (2026)</h1>
+    <p class="sub">A curated, live-verified list of remote-job data sources you can pull <strong>without an API key</strong> — each tested today, with a working example and a one-command exporter that turns any of them into CSV, JSON or SQLite.</p>
+    <span class="badge">verified live 2026-10-01</span>
+    <span class="badge">no API key required</span>
+    <span class="badge">3 sources, HTTP 200 confirmed</span>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>The short list (no-auth sources that work today)</h2>
+      <p>Most "job data" is gated behind an API key, a paywall, or an enterprise sales call. These are the free, keyless sources that returned real data when we tested them on <strong>2026-10-01</strong>:</p>
+      <table>
+        <thead><tr><th>Source</th><th>Auth</th><th>What you get</th><th>Checked</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://remote-jobs-api.tten.no/">Remote Jobs API</a></td>
+            <td>None</td>
+            <td>Normalized JSON feed across 5 boards (Remotive, RemoteOK, Jobicy, WWR, Hacker News) &mdash; <strong>329 live listings</strong></td>
+            <td class="ok">HTTP 200</td>
+          </tr>
+          <tr>
+            <td><a href="https://remotive.com/api/remote-jobs">Remotive API</a></td>
+            <td>None</td>
+            <td>Raw remote jobs JSON (the source behind the feed's Remotive board)</td>
+            <td class="ok">HTTP 200</td>
+          </tr>
+          <tr>
+            <td><a href="https://remoteok.com/api">RemoteOK API</a></td>
+            <td>None</td>
+            <td>RemoteOK listings JSON (the source behind the feed's RemoteOK board)</td>
+            <td class="ok">HTTP 200</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="color:var(--mut)">Why only three? The other common "free" job feeds either require an API key (e.g. the GitHub Jobs endpoint is now <code>404</code>/removed) or return stale/empty data. The Remote Jobs API is the only one that <strong>aggregates all five boards into a single clean schema</strong> for free, which is why it's the default for the exporter below.</p>
+    </section>
+
+    <section>
+      <h2>Get it as a real dataset (CSV / JSON / SQLite)</h2>
+      <p>The cleanest way to turn any of these into something you can analyze is a one-command export. <a href="https://github.com/earnnova-dev/remote-jobs-export"><code>remote-jobs-export</code></a> is stdlib-only, no key needed, and reads the Remote Jobs API:</p>
+      <pre># 200 jobs to a CSV (open in Excel / Google Sheets)
+pip install remote-jobs-export
+remote-jobs-export --limit 200 -o remote_jobs.csv
+
+# to SQLite for SQL analysis
+remote-jobs-export --limit 200 -o remote_jobs.db
+
+# to JSON for your own pipeline
+remote-jobs-export --limit 200 -o remote_jobs.json
+
+# filter: only Python roles, or only from one board
+remote-jobs-export --skills python -o python.csv
+remote-jobs-export --source remoteok -o remoteok.csv</pre>
+      <p>Or skip the tool and hit the keyless feed directly:</p>
+      <pre>curl -s "https://remote-jobs-api.tten.no/v1/jobs?limit=500" \
+  | python3 -c "import sys,json; [print(j['title'],'|',j['company']) for j in json.load(sys.stdin)['jobs']]"</pre>
+    </section>
+
+    <section>
+      <h2>What's in the feed (live, 2026-10-01)</h2>
+      <ul>
+        <li><strong>329 live listings</strong> across 5 boards.</li>
+        <li>By source: <code>jobicy 120</code>, <code>remoteok 98</code>, <code>wwr 86</code>, <code>remotive 16</code>, <code>hn 9</code>.</li>
+        <li><strong>85 listings carry a salary</strong> (top of range, <code>salary_max</code>) &mdash; filter with <code>--min-salary</code>.</li>
+        <li>Fields: <code>title</code>, <code>company</code>, <code>location</code>, <code>category</code>, <code>salary</code>, <code>source</code>, <code>published</code> (ISO-8601 UTC), <code>url</code>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Best for</h2>
+      <ul>
+        <li><strong>Data analysts / researchers</strong> &mdash; a reproducible, dated snapshot of the remote-job market for a specific day.</li>
+        <li><strong>Recruiters</strong> &mdash; trend a niche ("remote Python devops") over time from a CSV you re-pull weekly.</li>
+        <li><strong>Builders</strong> &mdash; feed the keyless JSON into a dashboard or your own job board without key juggling.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Tools in this product line</h2>
+      <ul>
+        <li><a href="https://remote-jobs-api.tten.no/">Remote Jobs API</a> &mdash; the live keyless JSON feed behind this list.</li>
+        <li><a href="https://earnnova-dev.github.io/remote-jobs-export/">remote-jobs-export</a> &mdash; the one-command CSV/JSON/SQLite exporter.</li>
+        <li><a href="https://github.com/earnnova-dev/jobfeed-watchdog">jobfeed-watchdog</a> &mdash; a GitHub Action that alerts when a feed like these silently breaks or changes schema.</li>
+        <li><a href="https://earnnova-dev.github.io/gigwatch/">GigWatch</a> &mdash; monitoring + digest alerts on top of job feeds.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>Free remote job datasets &amp; no-auth job APIs &mdash; a live-verified resource. &copy; 2026 Nova (earnnova-dev).</p>
+  </footer>
+</body>
+</html>

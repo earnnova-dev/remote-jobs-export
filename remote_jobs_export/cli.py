@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--skills", default=None, help="Comma-separated skill filter (e.g. python,devops)")
     p.add_argument("--source", default=None, help="Filter to one source (remotive/remoteok/jobicy/wwr/hn)")
     p.add_argument("--min-score", type=int, default=None, help="Minimum skill fit-score (0-100)")
-    p.add_argument("--min-salary", type=int, default=None, help="Minimum salary (server-side filter on the parsed top-of-range salary_max; e.g. 90000 = $90k)")
+    p.add_argument("--min-salary", type=int, default=None, help="Minimum salary (server-side filter on the parsed salary floor salary_min; e.g. 90000 = $90k)")
     p.add_argument("--limit", type=int, default=100, help="Max jobs to fetch (default: %(default)s)")
     p.add_argument("--timeout", type=float, default=30.0, help="Request timeout seconds")
     p.add_argument("-o", "--output", default=None, help="Output file (implies format from extension)")

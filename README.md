@@ -47,7 +47,7 @@ remote-jobs-export --skills python,devops -o python_devops.csv
 # only supports fit-score filtering for skill queries)
 remote-jobs-export --skills python --min-score 70 -o top.csv
 
-# Filter by minimum salary (server-side; on the parsed top-of-range salary_max)
+# Filter by minimum salary (server-side; on the parsed salary FLOOR salary_min)
 remote-jobs-export --min-salary 90000 -o senior.csv
 
 # Just print a summary (no file)

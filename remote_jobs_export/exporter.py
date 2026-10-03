@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional
 
 DEFAULT_BASE = "https://remote-jobs-api.tten.no"
 DEFAULT_LIMIT = 100
-USER_AGENT = "remote-jobs-export/1.0 (+https://github.com/earnnova-dev/remote-jobs-export)"
+USER_AGENT = "remote-jobs-export/1.1.0 (+https://github.com/earnnova-dev/remote-jobs-export)"
 
 # Canonical export columns (stable order). ``published``/``salary`` may be "".
 COLUMNS = [

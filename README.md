@@ -56,13 +56,18 @@ remote-jobs-export --limit 300 --summary
 
 ### Example summary output
 
+The summary reflects the live feed as-is. Note that `category` is frequently
+empty upstream (reported as `(none)` here) and `scored_jobs` is `0` for a plain
+export — fit-scores are only computed by the API for skill queries
+(`--skills`). The block below is a real capture of the quick-start command above:
+
 ```json
 {
-  "total": 200,
-  "by_source": [["jobicy", 120], ["wwr", 55], ["remoteok", 19], ["remotive", 6]],
-  "by_category": [["Customer Support", 10], ["DevOps and Sysadmin", 10], ...],
-  "top_locations": [["Anywhere in the World", 54], ["USA / Any", 14], ...],
-  "scored_jobs": 200
+  "total": 300,
+  "by_source": [["jobicy", 120], ["wwr", 83], ["remoteok", 81], ["remotive", 16]],
+  "by_category": [["(none)", 201], ["Design", 11], ["Product", 10], ["Sales and Marketing", 10], ["All Other Remote", 9]],
+  "top_locations": [["Anywhere in the World", 77], ["(none)", 32], ["USA / Senior", 17], ["USA / Director", 15], ["EMEA / Senior", 9]],
+  "scored_jobs": 0
 }
 ```
 
